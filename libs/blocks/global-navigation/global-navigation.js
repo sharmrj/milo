@@ -105,6 +105,8 @@ export const CONFIG = {
   },
 };
 
+export const UNAV_CONFIG = {};
+
 export const osMap = {
   Mac: 'macOS',
   Win: 'windows',
@@ -621,7 +623,8 @@ class Gnav {
       children: getChildren(),
     });
 
-    window.UniversalNav(getConfiguration());
+    UNAV_CONFIG.data = getConfiguration();
+    window.UniversalNav(UNAV_CONFIG.data);
 
     isDesktop.addEventListener('change', () => {
       window.UniversalNav.reload(getConfiguration());
