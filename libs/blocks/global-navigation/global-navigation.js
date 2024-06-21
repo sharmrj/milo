@@ -132,6 +132,76 @@ export const LANGMAP = {
   zh: ['cn', 'tw'],
 };
 
+const getDevice = () => {
+  const agent = navigator.userAgent;
+  for (const [os, osName] of Object.entries(osMap)) {
+    if (agent.includes(os)) return osName;
+  }
+  return 'linux';
+};
+const getChildren = (universalNavComponents) => {
+  const children = [CONFIG.universalNav.components.profile];
+  // reset sign up value on change
+  children[0].attributes.isSignUpRequired = false;
+
+  universalNavComponents?.forEach((component) => {
+    if (component === 'profile') return;
+    if (component === 'signup') {
+      children[0].attributes.isSignUpRequired = true;
+      return;
+    }
+
+    children.push(CONFIG.universalNav.components[component]);
+  });
+
+  return children;
+};
+
+export const getUniversalNavLocale = (locale) => {
+  if (!locale.prefix || locale.prefix === '/') return 'en_US';
+  const prefix = locale.prefix.replace('/', '');
+  if (prefix.includes('_')) {
+    const [lang, country] = prefix.split('_').reverse();
+    return `${lang.toLowerCase()}_${country.toUpperCase()}`;
+  }
+
+  if (prefix === 'uk') return 'en_GB';
+  const customLang = Object.keys(LANGMAP).find((key) => LANGMAP[key].includes(prefix));
+  if (customLang) return `${customLang.toLowerCase()}_${prefix.toUpperCase()}`;
+
+  return `${prefix.toLowerCase()}_${prefix.toUpperCase()}`;
+};
+
+export const getConfiguration = ({
+  target,
+  env = 'prod',
+  locale,
+  imsClientId = window.adobeid?.client_id,
+  onReady,
+  onAnalyticsEvent,
+  visitorGuid,
+  universalNavComponents,
+}) => ({
+  target,
+  env,
+  locale,
+  imsClientId,
+  theme: 'light',
+  onReady,
+  analyticsContext: {
+    consumer: {
+      name: 'adobecom',
+      version: '1.0',
+      platform: 'Web',
+      device: getDevice(),
+      os_version: navigator.platform,
+    },
+    event: { visitor_guid: visitorGuid },
+    onAnalyticsEvent,
+  },
+  children: getChildren(universalNavComponents),
+});
+
 // signIn, decorateSignIn and decorateProfileTrigger can be removed if IMS takes over the profile
 const signIn = () => {
   if (typeof window.adobeIMS?.signIn !== 'function') {
@@ -239,21 +309,6 @@ const closeOnClickOutside = (e) => {
   if (!isClickedElemOpen) {
     closeAllDropdowns();
   }
-};
-
-export const getUniversalNavLocale = (locale) => {
-  if (!locale.prefix || locale.prefix === '/') return 'en_US';
-  const prefix = locale.prefix.replace('/', '');
-  if (prefix.includes('_')) {
-    const [lang, country] = prefix.split('_').reverse();
-    return `${lang.toLowerCase()}_${country.toUpperCase()}`;
-  }
-
-  if (prefix === 'uk') return 'en_GB';
-  const customLang = Object.keys(LANGMAP).find((key) => LANGMAP[key].includes(prefix));
-  if (customLang) return `${customLang.toLowerCase()}_${prefix.toUpperCase()}`;
-
-  return `${prefix.toLowerCase()}_${prefix.toUpperCase()}`;
 };
 
 const convertToPascalCase = (str) => str
@@ -509,37 +564,11 @@ class Gnav {
       .then((data) => data?.identity?.ECID).catch(() => undefined) : undefined;
     const experienceName = getExperienceName();
 
-    const getDevice = () => {
-      const agent = navigator.userAgent;
-      for (const [os, osName] of Object.entries(osMap)) {
-        if (agent.includes(os)) return osName;
-      }
-      return 'linux';
-    };
-
     const unavVersion = new URLSearchParams(window.location.search).get('unavVersion') || '1.1';
     await Promise.all([
       loadScript(`https://${environment}.adobeccstatic.com/unav/${unavVersion}/UniversalNav.js`),
       loadStyles(`https://${environment}.adobeccstatic.com/unav/${unavVersion}/UniversalNav.css`),
     ]);
-
-    const getChildren = () => {
-      const children = [CONFIG.universalNav.components.profile];
-      // reset sign up value on change
-      children[0].attributes.isSignUpRequired = false;
-
-      this.universalNavComponents?.forEach((component) => {
-        if (component === 'profile') return;
-        if (component === 'signup') {
-          children[0].attributes.isSignUpRequired = true;
-          return;
-        }
-
-        children.push(CONFIG.universalNav.components[component]);
-      });
-
-      return children;
-    };
 
     const onAnalyticsEvent = (data) => {
       if (!data) return;
@@ -598,33 +627,22 @@ class Gnav {
       });
     };
 
-    const getConfiguration = () => ({
+    const data = {
       target: this.blocks.universalNav,
       env: environment,
       locale,
       imsClientId: window.adobeid?.client_id,
-      theme: 'light',
       onReady: () => {
         this.decorateAppPrompt({ getAnchorState: () => window.UniversalNav.getComponent?.('app-switcher') });
       },
-      analyticsContext: {
-        consumer: {
-          name: 'adobecom',
-          version: '1.0',
-          platform: 'Web',
-          device: getDevice(),
-          os_version: navigator.platform,
-        },
-        event: { visitor_guid: visitorGuid },
-        onAnalyticsEvent,
-      },
-      children: getChildren(),
-    });
-
-    window.UniversalNav(getConfiguration());
+      onAnalyticsEvent,
+      visitorGuid,
+      universalNavComponents: this.universalNavComponents,
+    };
+    window.UniversalNav(getConfiguration(data));
 
     isDesktop.addEventListener('change', () => {
-      window.UniversalNav.reload(getConfiguration());
+      window.UniversalNav.reload(getConfiguration(data));
     });
   };
 
