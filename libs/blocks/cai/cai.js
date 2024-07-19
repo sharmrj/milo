@@ -1,11 +1,20 @@
 /* Adapted from https://github.com/hlxsites/cai/blob/main/blocks/cai/cai.js */
 
+function generateOverlay(data) {
+  return document.createRange().createContextualFragment(`<div class="credentials-overlay">${data}</div>`);
+}
+
 const c2paData = async (imagePath) => {
   // Fails on localhost
   const subDomain = window.location.origin.split('://')[1].split('.')[0];
   const res = await fetch(`http://localhost:3000/metadata${imagePath}?subDomain=${subDomain}`);
-  return res;
+  const data = await res.json();
+  return generateOverlay(data);
 };
+
+function insertOverlay(root, node) {
+  root.insertAdjacentElement('afterbegin', node);
+}
 
 export default function decorate(block) {
   let c2pa = 'Empty';
@@ -22,12 +31,12 @@ export default function decorate(block) {
       </g>
       </svg>`;
   block.append(crOverlay);
+  const { pathname } = new URL(src);
 
   crOverlay.addEventListener('mouseenter', async () => {
     try {
-      const { pathname } = new URL(src);
-      c2pa = c2pa === 'Empty' ? await c2paData(pathname).then((r) => r.json()) : c2pa;
-      console.log(c2pa);
+      c2pa = c2pa === 'Empty' ? await c2paData(pathname) : c2pa;
+      insertOverlay(block, c2pa);
     } catch (e) {
       console.log(e);
     }

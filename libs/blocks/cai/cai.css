@@ -9,3 +9,7 @@
     width: fit-content;
     position: relative;
 }
+
+.cai > .credentials-overlay {
+  position: absolute;
+}
