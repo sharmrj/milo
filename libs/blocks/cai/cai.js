@@ -48,7 +48,7 @@ export default function decorate(block) {
 
   crOverlay.addEventListener('mouseenter', async () => {
     try {
-      c2pa?.classList.remove('hidden');
+      c2pa?.classList?.remove('hidden');
       if (c2pa === 'Empty') insertLoader(block);
       c2pa = c2pa === 'Empty' ? await c2paData(pathname) : c2pa;
       removeOverlay(block);
