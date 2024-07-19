@@ -16,6 +16,10 @@
   left: 100%;
 }
 
+.cai > .credentials-overlay.hidden {
+  display:none;
+}
+
 .loader {
   width: 40px;
   aspect-ratio: 1;
