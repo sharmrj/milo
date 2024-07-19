@@ -23,7 +23,7 @@ export default function decorate(block) {
       </svg>`;
   block.append(crOverlay);
 
-  crOverlay.addEventListener('mouseover', async () => {
+  crOverlay.addEventListener('mouseenter', async () => {
     try {
       const { pathname } = new URL(src);
       c2pa = c2pa === 'Empty' ? await c2paData(pathname).then((r) => r.json()) : c2pa;
