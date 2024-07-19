@@ -10,11 +10,11 @@ async function thumbnailToBase64(thumbnail) {
   return base64url;
 }
 
-function generateOverlay(data) {
+async function generateOverlay(data) {
   console.log(data.thumbnail);
   return document.createRange().createContextualFragment(`
     <div class="credentials-overlay">
-      <img src=${thumbnailToBase64(data.thumbnail)}></img>
+      <img src=${await thumbnailToBase64(data.thumbnail)}></img>
       <div>${data.claim_generator}</div>
     </div>`);
 }
@@ -28,7 +28,8 @@ const c2paData = async (imagePath) => {
   const subDomain = window.location.origin.split('://')[1].split('.')[0];
   const res = await fetch(`http://localhost:3000/metadata${imagePath}?subDomain=${subDomain}`);
   const data = await res.json();
-  return generateOverlay(data);
+  const overlay = await generateOverlay(data);
+  return overlay;
 };
 
 function insertLoader(root) {
