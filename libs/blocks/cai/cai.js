@@ -8,6 +8,7 @@ const c2paData = async (imagePath) => {
 };
 
 export default function decorate(block) {
+  let c2pa = 'Empty';
   const image = block.querySelector('img');
   const [src] = image.src.split('?');
   const nocorsURL = `https://little-forest-58aa.david8603.workers.dev/?url=${src}`;
@@ -25,8 +26,8 @@ export default function decorate(block) {
   crOverlay.addEventListener('mouseover', async () => {
     try {
       const { pathname } = new URL(src);
-      const d = await c2paData(pathname);
-      console.log(d);
+      c2pa = c2pa === 'Empty' ? await c2paData(pathname).then((r) => r.json()) : c2pa;
+      console.log(c2pa);
     } catch (e) {
       console.log(e);
     }
