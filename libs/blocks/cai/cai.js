@@ -1,20 +1,10 @@
 /* Adapted from https://github.com/hlxsites/cai/blob/main/blocks/cai/cai.js */
-async function thumbnailToBase64(thumbnail) {
-  // use a FileReader to generate a base64 data URI:
-  const buffer = new Uint16Array(thumbnail.data.data);
-  const base64url = await new Promise((r) => {
-    const reader = new FileReader();
-    reader.onload = () => r(reader.result);
-    reader.readAsDataURL(new Blob([buffer], { type: thumbnail.format }));
-  });
-  return base64url;
-}
 
-async function generateOverlay(data) {
+function generateOverlay(data) {
   console.log(data.thumbnail);
   return document.createRange().createContextualFragment(`
     <div class="credentials-overlay">
-      <img src=${await thumbnailToBase64(data.thumbnail)}></img>
+      <img src=${data.thumbnail}
       <div>${data.claim_generator}</div>
     </div>`);
 }
@@ -28,8 +18,7 @@ const c2paData = async (imagePath) => {
   const subDomain = window.location.origin.split('://')[1].split('.')[0];
   const res = await fetch(`http://localhost:3000/metadata${imagePath}?subDomain=${subDomain}`);
   const data = await res.json();
-  const overlay = await generateOverlay(data);
-  return overlay;
+  return generateOverlay(data);
 };
 
 function insertLoader(root) {
