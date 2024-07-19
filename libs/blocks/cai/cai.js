@@ -1,7 +1,7 @@
 /* Adapted from https://github.com/hlxsites/cai/blob/main/blocks/cai/cai.js */
 
 function generateOverlay(data) {
-  return document.createRange().createContextualFragment(`<div class="credentials-overlay">${data.claimGenerator}</div>`);
+  return document.createRange().createContextualFragment(`<div class="credentials-overlay">${data.claim_generator}</div>`);
 }
 
 const c2paData = async (imagePath) => {
