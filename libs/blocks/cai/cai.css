@@ -1,0 +1,11 @@
+/* Taken from https://github.com/hlxsites/cai/blob/main/blocks/cai/cai.css */
+.cai .cai-overlay {
+    position: absolute;
+    top: 2em;
+    right: 2em;
+}
+
+.cai {
+    width: fit-content;
+    position: relative;
+}
