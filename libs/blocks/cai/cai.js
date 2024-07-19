@@ -51,6 +51,7 @@ export default function decorate(block) {
       block.querySelector('.credentials-overlay')?.classList?.remove('hidden');
       if (c2pa === 'Empty') {
         insertLoader(block);
+        c2pa = 'Waiting';
         c2pa = await c2paData(pathname);
         removeOverlay(block);
         insertOverlay(block, c2pa);
