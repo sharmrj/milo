@@ -22,7 +22,13 @@ export default function decorate(block) {
       </svg>`;
   block.append(crOverlay);
 
-  crOverlay.addEventListener('mouseover', () => {
-    console.log(c2paData(src));
+  crOverlay.addEventListener('mouseover', async () => {
+    try {
+      const { pathname } = new URL(src);
+      const d = await c2paData(pathname);
+      console.log(d);
+    } catch (e) {
+      console.log(e);
+    }
   });
 }
