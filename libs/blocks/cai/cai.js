@@ -2,7 +2,7 @@
 
 const c2paData = async (imagePath) => {
   // Fails on localhost
-  const subDomain = window.location.href.split['://'][1].split('.')[0];
+  const subDomain = window.location.origin.split('://')[1].split('.')[0];
   const res = await fetch(`localhost:3000/metadata/${imagePath}?subDomain=${subDomain}`);
   return res;
 };
