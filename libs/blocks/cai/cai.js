@@ -1,7 +1,14 @@
 /* Adapted from https://github.com/hlxsites/cai/blob/main/blocks/cai/cai.js */
 
 function generateOverlay(data) {
-  return document.createRange().createContextualFragment(`<div class="credentials-overlay">${data.claim_generator}</div>`);
+  const thumbnailBuffer = Buffer.from((data.thumbnail.data.data));
+  const thumbnail = new Blob(thumbnailBuffer);
+  const thumbnailUrl = URL.createObjectURL(thumbnail);
+  return document.createRange().createContextualFragment(`
+    <div class="credentials-overlay">
+      <img src="${thumbnailUrl}"></img>
+      <div>${data.claim_generator}</div>
+    </div>`);
 }
 
 function removeOverlay(root) {
@@ -55,7 +62,6 @@ export default function decorate(block) {
         c2pa = await c2paData(pathname);
         removeOverlay(block);
         insertOverlay(block, c2pa);
-        console.log(c2pa);
       }
     } catch (e) {
       console.log(e);
