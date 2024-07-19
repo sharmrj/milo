@@ -49,15 +49,12 @@ export default function decorate(block) {
   crOverlay.addEventListener('mouseenter', async () => {
     try {
       c2pa?.classList?.remove('hidden');
-      if (c2pa === 'Empty') {
-        insertLoader(block);
-        c2pa = await c2paData(pathname);
-        removeOverlay(block);
-        insertOverlay(block, c2pa);
-      }
+      if (c2pa === 'Empty') insertLoader(block);
+      c2pa = c2pa === 'Empty' ? await c2paData(pathname) : c2pa;
+      removeOverlay(block);
+      insertOverlay(block, c2pa);
     } catch (e) {
       console.log(e);
-      removeOverlay(block);
     }
   });
   crOverlay.addEventListener('mouseleave', () => {
