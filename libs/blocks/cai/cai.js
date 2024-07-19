@@ -4,6 +4,10 @@ function generateOverlay(data) {
   return document.createRange().createContextualFragment(`<div class="credentials-overlay">${data.claim_generator}</div>`);
 }
 
+function removeOverlay(root) {
+  root.querySelector('.credentials-overlay').remove();
+}
+
 const c2paData = async (imagePath) => {
   // Fails on localhost
   const subDomain = window.location.origin.split('://')[1].split('.')[0];
@@ -11,6 +15,13 @@ const c2paData = async (imagePath) => {
   const data = await res.json();
   return generateOverlay(data);
 };
+
+function insertLoader(root) {
+  const overlay = document.createElement('div');
+  overlay.classList.add('credentials-overlay');
+  overlay.innerHTML = '<div class="loader"></div>';
+  root.appendChild(overlay);
+}
 
 function insertOverlay(root, node) {
   if (node === 'Empty') return;
@@ -37,7 +48,9 @@ export default function decorate(block) {
 
   crOverlay.addEventListener('mouseenter', async () => {
     try {
+      if (c2pa === 'Empty') insertLoader(block);
       c2pa = c2pa === 'Empty' ? await c2paData(pathname) : c2pa;
+      removeOverlay(block);
       insertOverlay(block, c2pa);
     } catch (e) {
       console.log(e);
