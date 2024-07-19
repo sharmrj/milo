@@ -48,7 +48,7 @@ export default function decorate(block) {
 
   crOverlay.addEventListener('mouseenter', async () => {
     try {
-      document.querySelector('.credentials-overlay')?.classList?.remove('hidden');
+      block.querySelector('.credentials-overlay')?.classList?.remove('hidden');
       if (c2pa === 'Empty') {
         insertLoader(block);
         c2pa = await c2paData(pathname);
@@ -62,6 +62,6 @@ export default function decorate(block) {
     }
   });
   crOverlay.addEventListener('mouseleave', () => {
-    document.querySelector('.credentials-overlay')?.classList?.add('hidden');
+    block.querySelector('.credentials-overlay')?.classList?.add('hidden');
   });
 }
