@@ -1,5 +1,12 @@
 /* Adapted from https://github.com/hlxsites/cai/blob/main/blocks/cai/cai.js */
 
+const c2paData = async (imagePath) => {
+  // Fails on localhost
+  const subDomain = window.location.href.split['://'][1].split('.')[0];
+  const res = await fetch(`localhost:3000/metadata/${imagePath}?subDomain=${subDomain}`);
+  return res;
+};
+
 export default function decorate(block) {
   const image = block.querySelector('img');
   const [src] = image.src.split('?');
@@ -19,11 +26,3 @@ export default function decorate(block) {
     console.log(c2paData(src));
   });
 }
-
-const c2paData = async (imagePath) => {
-  // Fails on localhost
-  const subDomain = window.location.href.split['://'][1].split('.')[0];
-  const res = await fetch(`localhost:3000/metadata/${imagePath}?subDomain=${subDomain}`;
-  return res;
-};
-
