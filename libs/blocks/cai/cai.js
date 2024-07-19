@@ -1,9 +1,10 @@
 /* Adapted from https://github.com/hlxsites/cai/blob/main/blocks/cai/cai.js */
 
 function generateOverlay(data) {
+  console.log(data.thumbnail);
   return document.createRange().createContextualFragment(`
     <div class="credentials-overlay">
-      ${data.thumbnail}
+      <img src=${data.thumbnail}></img>
       <div>${data.claim_generator}</div>
     </div>`);
 }
