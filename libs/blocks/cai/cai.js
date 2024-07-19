@@ -1,14 +1,9 @@
 /* Adapted from https://github.com/hlxsites/cai/blob/main/blocks/cai/cai.js */
 
 function generateOverlay(data) {
-  const thumbnail = new Blob(
-    data.thumbnail.data.data.map((x) => parseInt(x.toString(16), 16)),
-    { type: data.thumbnail.format },
-  );
-  const thumbnailUrl = URL.createObjectURL(thumbnail);
   return document.createRange().createContextualFragment(`
     <div class="credentials-overlay">
-      <img src="${thumbnailUrl}"></img>
+      ${data.thumbnail}
       <div>${data.claim_generator}</div>
     </div>`);
 }
