@@ -13,7 +13,7 @@ const c2paData = async (imagePath) => {
 };
 
 function insertOverlay(root, node) {
-  root.insertAdjacentElement('afterbegin', node);
+  root.appendChild(node);
 }
 
 export default function decorate(block) {
