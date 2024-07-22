@@ -1,11 +1,12 @@
 /* Adapted from https://github.com/hlxsites/cai/blob/main/blocks/cai/cai.js */
+import { createC2pa } from 'https://cdn.jsdelivr.net/npm/c2pa@0.17.2/+esm';
 
 function generateOverlay(data) {
-  console.log(data.thumbnail);
+  console.log(data.thumbnail.getUrl());
   return document.createRange().createContextualFragment(`
     <div class="credentials-overlay">
-      <img src=${data.thumbnail}
-      <div>${data.claim_generator}</div>
+      <img src=${data.thumbnail.getUrl()?.url}
+      <div>${data.claimGenerator}</div>
     </div>`);
 }
 
@@ -13,11 +14,30 @@ function removeOverlay(root) {
   root.querySelector('.credentials-overlay').remove();
 }
 
+const getManifest = async (imagePath) => {
+  // Initialize the c2pa-js SDK
+  const c2pa = await createC2pa({
+    wasmSrc:
+      'https://cdn.jsdelivr.net/npm/c2pa@0.17.2/dist/assets/wasm/toolkit_bg.wasm',
+    workerSrc:
+      'https://cdn.jsdelivr.net/npm/c2pa@0.17.2/dist/c2pa.worker.min.js',
+  });
+
+  try {
+    // Read in our sample image and get a manifest store
+    const { manifestStore } = await c2pa.read(imagePath);
+
+    // Get the active manifest
+    const activeManifest = manifestStore?.activeManifest;
+    return activeManifest;
+  } catch (err) {
+    console.error('Error reading image:', err);
+    return {};
+  }
+};
+
 const c2paData = async (imagePath) => {
-  // Fails on localhost
-  const subDomain = window.location.origin.split('://')[1].split('.')[0];
-  const res = await fetch(`http://localhost:3000/metadata${imagePath}?subDomain=${subDomain}`);
-  const data = await res.json();
+  const data = await getManifest(imagePath);
   return generateOverlay(data);
 };
 
