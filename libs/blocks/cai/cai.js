@@ -1,4 +1,6 @@
 /* Adapted from https://github.com/hlxsites/cai/blob/main/blocks/cai/cai.js */
+// eslint-disable-next-line
+import { createC2pa } from 'https://cdn.jsdelivr.net/npm/c2pa@0.17.2';
 
 function generateOverlay(data) {
   console.log(data.thumbnail.getUrl());
@@ -16,7 +18,6 @@ function removeOverlay(root) {
 const getManifest = async (imagePath) => {
   // Initialize the c2pa-js SDK
   // eslint-disable-next-line
-  const { createC2pa } = import('https://cdn.jsdelivr.net/npm/c2pa@0.17.2');
   const c2pa = await createC2pa({
     wasmSrc:
       'https://cdn.jsdelivr.net/npm/c2pa@0.17.2/dist/assets/wasm/toolkit_bg.wasm',
