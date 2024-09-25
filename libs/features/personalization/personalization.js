@@ -1072,8 +1072,13 @@ export async function init(enablements = {}) {
   }
 
   if (target === true || (target === 'gnav' && postLCP)) {
-    const { getTargetPersonalization } = await import('../../martech/martech.js');
-    const { targetManifests, targetPropositions } = await getTargetPersonalization();
+    // const { targetManifests, targetPropositions } = await getTargetPersonalization();
+    const alloyResp = await window.persPromise;
+    console.log(alloyResp);
+    const targetManifests = alloyResp?.destinations?.[0]?.data?.content?.manifestContent ?? [];
+    const { default: initEntitlements } = await entitlementsPromise;
+    getConfig().entitlements(initEntitlements(alloyResp?.destinations ?? []));
+    const targetPropositions = alloyResp?.propositions ?? [];
     manifests = await Promise.all((await Promise.all(manifestPromises))
       .map(async (resp) => {
         try {

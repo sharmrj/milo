@@ -1002,11 +1002,28 @@ export async function loadMartech({
     return false;
   }
 
-  window.targetGlobalSettings = { bodyHidingEnabled: false };
-  loadIms().catch(() => {});
+  // window.targetGlobalSettings = { bodyHidingEnabled: false };
+  // loadIms().catch(() => {});
 
-  const { default: initMartech } = await import('../martech/martech.js');
-  await initMartech({ persEnabled, persManifests, postLCP });
+  // const { default: initMartech } = await import('../martech/martech.js');
+  // await initMartech({ persEnabled, persManifests, postLCP });
+
+  if (!window.alloy) {
+    (window.__alloyNS ??= []).push('alloy'); // eslint-disable-line
+    window.alloy = (...args) => new Promise((resolve, reject) => {
+      queueMicrotask(() => {
+        window.alloy.q.push([resolve, reject, args]);
+      });
+    });
+    window.alloy.q = [];
+  }
+  await import('./alloy.min.js');
+  await window.alloy('configure', {
+    edgeConfigId: ENVS.stage.edgeConfigId,
+    orgId: '9E1005A551ED61CA0A490D45@AdobeOrg',
+  });
+
+  window.persPromise = window.alloy('sendEvent', { renderDecisions: false });
 
   return true;
 }
