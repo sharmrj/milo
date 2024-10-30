@@ -994,29 +994,66 @@ export async function loadIms() {
   return imsLoaded;
 }
 
+const getPageNameForAnalytics = () => {
+  const { host, pathname } = new URL(window.location.href);
+  const { locale } = getConfig();
+  const [modifiedPath, _] = pathname.split('/').filter((x) => x !== locale.prefix).join(':').split('.'); // eslint-disable-line
+  return host.replace('www.', '').concat(':').concat(modifiedPath);
+};
+
 export async function loadMartech({
   persEnabled = false,
   persManifests = [],
   postLCP = false,
 } = {}) {
   // eslint-disable-next-line no-underscore-dangle
-  if (window.marketingtech?.adobe?.launch && window._satellite) {
-    return true;
-  }
+  // if (window.marketingtech?.adobe?.launch && window._satellite) {
+  //   return true;
+  // }
 
-  if (PAGE_URL.searchParams.get('martech') === 'off'
-    || PAGE_URL.searchParams.get('marketingtech') === 'off'
-    || getMetadata('martech') === 'off') {
-    return false;
-  }
+  // if (PAGE_URL.searchParams.get('martech') === 'off'
+  //   || PAGE_URL.searchParams.get('marketingtech') === 'off'
+  //   || getMetadata('martech') === 'off') {
+  //   return false;
+  // }
 
-  window.targetGlobalSettings = { bodyHidingEnabled: false };
-  loadIms().catch(() => {});
+  // window.targetGlobalSettings = { bodyHidingEnabled: false };
+  // loadIms().catch(() => {});
 
-  const { default: initMartech } = await import('../martech/martech.js');
-  await initMartech({ persEnabled, persManifests, postLCP });
+  // const { default: initMartech } = await import('../martech/martech.js');
+  // await initMartech({ persEnabled, persManifests, postLCP });
 
-  return true;
+  // return true;
+
+  // Using default values for now; we'll write out the business logic later
+  const dataStreamId = 'e065836d-be57-47ef-b8d1-999e1657e8fd';
+  const reportsuiteId = ['adbadobenonacdcprod', 'adbadobeprototype'];
+  const atPropertyVal = 'bc8dfa27-29cc-625c-22ea-f7ccebfc6231';
+
+  const pageName = getPageNameForAnalytics();
+
+  const edgeConfigOverrides = {
+    com_adobe_experience_platform: { datasets: { event: { datasetId: '' } } },
+    datastreamId: dataStreamId,
+    com_adobe_analytics: { reportSuites: reportsuiteId },
+    com_adobe_target: { propertyToken: atPropertyVal },
+  };
+
+  const isLoggedIn = window.performance.getEntriesByType('navigation')?.[0]
+    ?.serverTiming
+    ?.find((entry) => entry.name === 'sis')
+    ?.description === '1';
+
+  const body = { meta: { configOverrides: edgeConfigOverrides } };
+
+
+  const targetResp = await fetch('https://sstats.adobe.com/ee/v2/interact', {
+    method: 'POST',
+    headers: { 'x-gw-ims-org-id': '9E1005A551ED61CA0A490D45@AdobeOrg' },
+    body: JSON.stringify(body),
+  });
+
+  console.log(targetResp);
 }
 
 async function checkForPageMods() {
