@@ -1044,11 +1044,57 @@ export async function loadMartech({
     ?.find((entry) => entry.name === 'sis')
     ?.description === '1';
 
-  const body = { meta: { configOverrides: edgeConfigOverrides } };
+  const secidCookie = document.cookie
+    .split(';')
+    .map((x) => x.trim().split('='))
+    .find(([key, _]) => key === 'AMCV_9E1005A551ED61CA0A490D45%40AdobeOrg'); // eslint-ignore-line
 
+  const clean = /MCMID\|\d+/.exec(decodeURIComponent(secidCookie));
+
+  const getEcid = async () => {
+    try {
+      const resp = await fetch('https://dpm.demdex.net/id?d_orgid=9E1005A551ED61CA0A490D45&d_ver=2', { mode: 'no-cors' });
+      const data = await resp.json();
+      return data?.d_mid;
+    } catch {
+      return null;
+    }
+  };
+  const ecid = clean?.[0]?.replace('MCMID|', '') ?? await getEcid() ?? '7A702A466437E6F50A495C83@86071f62631c0cc0495e71.e';
+
+  const body = {
+    meta: { configOverrides: edgeConfigOverrides },
+    event: {
+      xdm: {
+        identityMap: {
+          adobeGUID: [
+            {
+              id: ecid,
+              primary: true,
+            },
+          ],
+        },
+        web: {
+          webPageDetails: {
+            URL: window.location.href,
+            siteSection: 'www.adobe.com',
+            server: 'www.adobe.com',
+            isErrorPage: false,
+            isHomePage: false,
+            name: pageName,
+            pageViews: { value: 1 },
+          },
+          webReferrer: { URL: document.referrer },
+        },
+        timestamp: new Date().toISOString(),
+        eventType: 'web.webpagedetails.pageViews',
+      },
+    },
+  };
 
   const targetResp = await fetch('https://sstats.adobe.com/ee/v2/interact', {
     method: 'POST',
+    mode: 'no-cors',
     headers: { 'x-gw-ims-org-id': '9E1005A551ED61CA0A490D45@AdobeOrg' },
     body: JSON.stringify(body),
   });
