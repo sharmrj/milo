@@ -377,7 +377,12 @@ class Gnav {
     if (this.elements.localNav || !this.newMobileNav || !this.isLocalNav() || isDesktop.matches) {
       localNavItems[0].querySelector('a').textContent = title.trim();
     } else {
-      const localNav = document.querySelector('.feds-localnav');
+      let localNav = document.querySelector('.feds-localnav');
+      if (!localNav) {
+        localNav = document.createElement('div');
+        localNav.classList.add('.feds-localnav');
+        this.block.after(localNav);
+      }
       localNav.append(toFragment`<button class="feds-navLink--hoverCaret feds-localnav-title"></button>`, toFragment` <div class="feds-localnav-items"></div>`);
 
       const itemWrapper = localNav.querySelector('.feds-localnav-items');
