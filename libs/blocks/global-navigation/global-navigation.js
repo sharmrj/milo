@@ -1174,8 +1174,9 @@ class Gnav {
 }
 
 const getSource = async () => {
-  const { locale, dynamicNavKey } = getConfig();
+  const { locale } = getConfig();
   let url = getMetadata('gnav-source') || `${locale.contentRoot}/gnav`;
+  const dynamicNavKey = 'soup';
   if (dynamicNavKey) {
     const { default: dynamicNav } = await import('../../features/dynamic-navigation/dynamic-navigation.js');
     url = dynamicNav(url, dynamicNavKey);
@@ -1186,7 +1187,7 @@ const getSource = async () => {
 export default async function init(block) {
   const { mep } = getConfig();
   const sourceUrl = await getSource();
-  const newMobileNav = getMetadata('mobile-gnav-v2') !== 'false';
+  const newMobileNav = true;
   const [url, hash = ''] = sourceUrl.split('#');
   if (hash === '_noActiveItem') {
     setDisableAEDState();
