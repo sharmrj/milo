@@ -402,7 +402,7 @@ class Gnav {
         || 64;
       window.addEventListener('scroll', () => {
         if (document.documentElement.scrollTop >= localNavOffset) localNav.classList.add('visible');
-        else localNav.classList.remove('visible');
+        else localNav.classList.remove('visible', 'active');
       });
       this.elements.localNav = localNav;
     }
