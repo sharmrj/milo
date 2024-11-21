@@ -982,13 +982,9 @@ header.new-nav .feds-breadcrumbs li:first-child:not(:nth-last-child(-n+3)):after
 
 /* local-nav */
 
-header + .feds-localnav {
-  position: sticky;
-  display: block;
+.feds-localnav.visible {
   top: 0;
-  width: 100%;
-  left: 0;
-  z-index: 2;
+  transition: top 0.25s ease;
 }
 
 .feds-localnav a {

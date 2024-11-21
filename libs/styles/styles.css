@@ -6,6 +6,7 @@
   /* stylelint-disable-next-line custom-property-pattern */
   --global-height-navPromo: 72px;
   --feds-totalheight-nav: calc(var(--feds-height-nav, --global-height-nav) + var(--feds-height-breadcrumbs, --global-height-breadcrumbs));
+  --feds-localnav-height: 53px;
 
   /* Colors */
   --link-color: #035fe6;
@@ -725,7 +726,16 @@ header.global-navigation a {
 }
 
 .feds-localnav {
-  height: 53px;
+  position:sticky;
+  height: var(--feds-localnav-height);
+  display: block;
+  top: 0;
+  width: 100%;
+  left: 0;
+  z-index: 11; /* one more than the header element */
+  margin-top: calc(var(--feds-localnav-height) * -1);
+  top: calc(var(--feds-localnav-height) * -1);
+  transition: top 0.25s ease;
 }
 
 @media (min-width: 900px) {

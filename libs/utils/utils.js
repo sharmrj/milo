@@ -775,7 +775,7 @@ function decorateHeader() {
   if (getMetadata('is-localnav') === 'true' && getMetadata('mobile-gnav-v2') !== 'false') {
     // Preserving space to avoid CLS issue
     const localNavWrapper = createTag('div', { class: 'feds-localnav' });
-    header.after(localNavWrapper);
+    header.before(localNavWrapper);
   }
   if (breadcrumbs) header.append(breadcrumbs);
   const promo = getMetadata('gnav-promo-source');

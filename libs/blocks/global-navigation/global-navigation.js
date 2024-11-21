@@ -398,6 +398,12 @@ class Gnav {
       localNav.querySelector('.feds-localnav-title').addEventListener('click', () => {
         localNav.classList.toggle('active');
       });
+      const localNavOffset = parseInt(new URL(window.location.href).searchParams.get('scrollOffset'), 10)
+        || 64;
+      window.addEventListener('scroll', () => {
+        if (document.documentElement.scrollTop >= localNavOffset) localNav.classList.add('visible');
+        else localNav.classList.remove('visible');
+      });
       this.elements.localNav = localNav;
     }
   };
