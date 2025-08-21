@@ -463,10 +463,28 @@ export function trigger({
 
 export const yieldToMain = () => new Promise((resolve) => { setTimeout(resolve, 0); });
 
+const executeMEPCommands = (body) => {
+  const config = getConfig();
+  const mepGnav = config?.mep?.inBlock?.['global-navigation'];
+  let commands = mepGnav?.commands || [];
+
+  const gnavMepCommands = config?.mep?.commands?.filter(
+    (command) => command?.modifiers?.find((modifier) => modifier === FLAGS?.includeGnav),
+  ) || [];
+
+  commands = commands.concat(gnavMepCommands);
+
+  if (commands?.length) {
+    /* c8 ignore next 3 */
+    handleCommands(commands, body, true, true);
+  }
+};
+
 export async function fetchAndProcessPlainHtml({
   url,
   plainHTMLPromise = null,
   shouldDecorateLinks = true,
+  personalizePlainHTML = executeMEPCommands,
 } = {}) {
   let path = getFederatedUrl(url);
   const config = getConfig();
@@ -488,20 +506,13 @@ export async function fetchAndProcessPlainHtml({
   }
   const text = await res.text();
   const { body } = new DOMParser().parseFromString(text, 'text/html');
+
   if (mepFragment?.manifestId) body.dataset.manifestId = mepFragment.manifestId;
   if (mepFragment?.targetManifestId) body.dataset.adobeTargetTestid = mepFragment.targetManifestId;
-  let commands = mepGnav?.commands || [];
 
-  const gnavMepCommands = config?.mep?.commands?.filter(
-    (command) => command?.modifiers?.find((modifier) => modifier === FLAGS?.includeGnav),
-  ) || [];
+  // awaited since it might be async even if it usually isn't
+  await personalizePlainHTML(body);
 
-  commands = commands.concat(gnavMepCommands);
-
-  if (commands?.length) {
-    /* c8 ignore next 3 */
-    handleCommands(commands, body, true, true);
-  }
   const inlineFrags = [...body.querySelectorAll('a[href*="#_inline"]')];
   if (inlineFrags.length) {
     const { default: loadInlineFrags } = await import('../../fragment/fragment.js');

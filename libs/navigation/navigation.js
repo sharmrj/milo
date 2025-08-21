@@ -73,6 +73,7 @@ export default async function loadBlock(configs, customLib) {
     theme,
     stageDomainsMap = {},
     allowedOrigins = [],
+    personalizeGnav = (x) => x,
   } = configs || {};
   if (!header && !footer) {
     // eslint-disable-next-line no-console
@@ -135,6 +136,7 @@ export default async function loadBlock(configs, customLib) {
     allowedOrigins: [...allowedOrigins, origin],
     onFooterReady: footer?.onReady,
     onFooterError: footer?.onError,
+    personalizeGnav,
     ...paramConfigs,
   };
   setConfig(clientConfig);
